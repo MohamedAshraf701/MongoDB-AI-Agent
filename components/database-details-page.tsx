@@ -7,16 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { 
-  DatabaseIcon, 
-  ArrowLeftIcon, 
-  TableIcon,
-  InfoIcon,
-  BarChart3Icon,
-  CodeIcon,
-  RefreshCwIcon,
-  CollectionsIcon as LayersIcon
-} from "lucide-react"
+import { DatabaseIcon, ArrowLeftIcon, TableIcon, InfoIcon, BarChart3Icon, CodeIcon, RefreshCwIcon, SectionIcon as LayersIcon } from "lucide-react"
 
 type SchemaSummary = {
   dbName: string
@@ -257,102 +248,6 @@ export function DatabaseDetailsPage() {
             {/* Results */}
             <ResultTable rows={results?.rows ?? []} />
           </div>
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="text-white">Collections Schema</CardTitle>
-                <CardDescription className="text-gray-300">
-                  Detailed view of all collections and their fields
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {!schema ? (
-                  <div className="text-gray-400">No schema available</div>
-                ) : schema.collections.length === 0 ? (
-                  <div className="text-gray-400">No collections found</div>
-                ) : (
-                  <Accordion type="single" collapsible className="w-full">
-                    {schema.collections.map((collection, index) => (
-                      <AccordionItem key={collection.name} value={collection.name} className="border-white/10">
-                        <AccordionTrigger className="text-white hover:text-purple-300 hover:no-underline">
-                          <div className="flex items-center justify-between w-full mr-4">
-                            <span className="font-medium">{collection.name}</span>
-                            <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
-                              {collection.fields.length} fields
-                            </Badge>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 pt-4">
-                            {collection.fields.map((field) => (
-                              <div key={field} className="bg-white/5 rounded-md p-2 border border-white/10">
-                                <code className="text-sm text-gray-300">{field}</code>
-                              </div>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">Query Performance</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Average response times and success rates
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Avg Response Time</span>
-                      <span className="text-green-400 font-mono">~150ms</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Success Rate</span>
-                      <span className="text-green-400">100%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-300">Queries Cached</span>
-                      <span className="text-blue-400">0%</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="text-white">Popular Collections</CardTitle>
-                  <CardDescription className="text-gray-300">
-                    Most frequently queried collections
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {schema?.collections.slice(0, 3).map((collection, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <span className="text-gray-300">{collection.name}</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-purple-500 rounded-full transition-all duration-500"
-                              style={{ width: `${Math.random() * 100}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-gray-400">0</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
         </div>
       </main>
     </div>
