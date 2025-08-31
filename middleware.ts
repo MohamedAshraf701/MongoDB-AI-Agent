@@ -9,6 +9,9 @@ export function middleware(request: NextRequest) {
     if (!sid) {
       return NextResponse.redirect(new URL('/connect', request.url))
     }
+    
+    // Additional check: verify the session has valid connection data
+    // This would require a session validation endpoint in a real implementation
   }
 
   return NextResponse.next()

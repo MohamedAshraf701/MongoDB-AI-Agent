@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { TableIcon, DownloadIcon } from "lucide-react"
+import { TableIcon, DownloadIcon, DatabaseIcon, FileTextIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 function normalizeRows(rows: any[]): any[] {
@@ -32,20 +32,27 @@ export function ResultTable({ rows }: { rows: any[] }) {
   )
 
   return (
-    <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+    <Card className="glass border-primary/20 shadow-xl">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-white flex items-center">
-              <TableIcon className="mr-2 h-5 w-5 text-blue-400" />
+            <CardTitle className="flex items-center text-xl">
+              <TableIcon className="mr-2 h-6 w-6 text-primary" />
               Query Results
             </CardTitle>
-            <CardDescription className="text-gray-300">
-              {rows.length ? `${rows.length} row(s) returned` : "No results yet - ask a question to see data"}
+            <CardDescription className="text-base">
+              {rows.length ? (
+                <div className="flex items-center space-x-2">
+                  <FileTextIcon className="h-4 w-4 text-primary" />
+                  <span>{rows.length} row(s) returned</span>
+                </div>
+              ) : (
+                "No results yet - ask a question to see data"
+              )}
             </CardDescription>
           </div>
           {rows.length > 0 && (
-            <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
+            <Button variant="outline" size="sm" className="border-primary/30 text-primary hover:bg-primary/10 transition-all duration-300">
               <DownloadIcon className="mr-2 h-4 w-4" />
               Export
             </Button>
@@ -55,16 +62,19 @@ export function ResultTable({ rows }: { rows: any[] }) {
       <CardContent>
         {!rows.length ? (
           <div className="text-center py-12">
-            <TableIcon className="h-12 w-12 text-gray-500 mx-auto mb-4" />
-            <div className="text-gray-400">Ask a question to see results here</div>
+            <div className="relative">
+              <DatabaseIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4 animate-float" />
+              <div className="absolute inset-0 h-12 w-12 text-muted-foreground/30 animate-ping mx-auto" />
+            </div>
+            <div className="text-muted-foreground">Ask a question to see results here</div>
           </div>
         ) : (
-          <div className="w-full overflow-auto bg-black/20 rounded-lg border border-white/10">
+          <div className="w-full overflow-auto glass rounded-lg border border-primary/20">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-400 border-b border-white/10">
+                <tr className="text-left text-muted-foreground border-b border-border/50">
                   {columns.map((c) => (
-                    <th key={c} className="py-3 px-4 font-medium bg-white/5">
+                    <th key={c} className="py-3 px-4 font-medium bg-muted/30">
                       {c}
                     </th>
                   ))}
@@ -72,9 +82,9 @@ export function ResultTable({ rows }: { rows: any[] }) {
               </thead>
               <tbody>
                 {flat.map((r, i) => (
-                  <tr key={i} className="border-t border-white/10 hover:bg-white/5 transition-colors">
+                  <tr key={i} className="border-t border-border/30 hover:bg-muted/30 transition-colors duration-200">
                     {columns.map((c) => (
-                      <td key={c} className="py-3 px-4 align-top text-gray-300 font-mono text-xs">
+                      <td key={c} className="py-3 px-4 align-top font-mono text-xs">
                         <div className="max-w-xs truncate">
                           {(r as any)[c] ?? ""}
                         </div>

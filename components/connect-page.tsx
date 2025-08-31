@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { 
   DatabaseIcon, 
   ArrowLeftIcon, 
@@ -14,7 +15,10 @@ import {
   AlertCircleIcon,
   BrainIcon,
   ShieldIcon,
-  ZapIcon
+  ZapIcon,
+  ServerIcon,
+  KeyIcon,
+  PlayIcon
 } from "lucide-react"
 
 type ConnectResponse = {
@@ -35,6 +39,7 @@ export function ConnectPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
+  const [step, setStep] = useState(1)
 
   useEffect(() => {
     setIsVisible(true)
@@ -44,6 +49,8 @@ export function ConnectPage() {
     e.preventDefault()
     setError(null)
     setLoading(true)
+    setStep(2)
+    
     try {
       const res = await fetch("/api/connect", {
         method: "POST",
@@ -53,66 +60,107 @@ export function ConnectPage() {
       const data: ConnectResponse = await res.json()
       if (!res.ok || !data.ok) {
         setError(data.error ?? "Failed to connect")
+        setStep(1)
       } else {
         setSuccess(true)
+        setStep(3)
         setTimeout(() => {
           router.push("/dashboard")
-        }, 1500)
+        }, 2000)
       }
     } catch (err: any) {
       setError(err?.message ?? "Connection failed")
+      setStep(1)
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
       {/* Navigation */}
-      <nav className="border-b border-white/10 backdrop-blur-sm bg-black/20">
+      <nav className="border-b border-border/50 backdrop-blur-sm bg-background/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center space-x-2">
-              <DatabaseIcon className="h-8 w-8 text-purple-400" />
-              <span className="text-xl font-bold text-white">MongoDB AI Agent</span>
+              <DatabaseIcon className="h-8 w-8 text-primary animate-pulse-glow" />
+              <span className="text-xl font-bold gradient-text">MongoDB AI Agent</span>
             </Link>
-            <Link href="/">
-              <Button variant="ghost" className="text-gray-300 hover:text-white">
-                <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                Back to Home
-              </Button>
-            </Link>
+            <div className="flex items-center space-x-4">
+              <ThemeToggle />
+              <Link href="/">
+                <Button variant="ghost" className="text-muted-foreground hover:text-primary transition-colors duration-300">
+                  <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                  Back to Home
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] p-4">
-        <div className={`w-full max-w-4xl transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`w-full max-w-6xl transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="text-center mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
               Connect Your Database
             </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Securely connect to your MongoDB instance to start querying with AI
             </p>
+            
+            {/* Progress Steps */}
+            <div className="flex justify-center mt-8 mb-8">
+              <div className="flex items-center space-x-4">
+                {[
+                  { num: 1, label: "Configure", icon: KeyIcon },
+                  { num: 2, label: "Connect", icon: ServerIcon },
+                  { num: 3, label: "Ready", icon: PlayIcon }
+                ].map((s, i) => (
+                  <div key={i} className="flex items-center">
+                    <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all duration-500 ${
+                      step >= s.num 
+                        ? 'bg-primary border-primary text-primary-foreground' 
+                        : 'border-border text-muted-foreground'
+                    }`}>
+                      {step > s.num ? (
+                        <CheckCircleIcon className="w-5 h-5" />
+                      ) : (
+                        <s.icon className="w-4 h-4" />
+                      )}
+                    </div>
+                    <span className={`ml-2 text-sm font-medium transition-colors duration-300 ${
+                      step >= s.num ? 'text-primary' : 'text-muted-foreground'
+                    }`}>
+                      {s.label}
+                    </span>
+                    {i < 2 && (
+                      <div className={`w-8 h-0.5 mx-4 transition-colors duration-500 ${
+                        step > s.num ? 'bg-primary' : 'bg-border'
+                      }`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Connection Form */}
-            <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+            <Card className="glass border-primary/20 shadow-xl">
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <DatabaseIcon className="mr-2 h-5 w-5 text-purple-400" />
+                <CardTitle className="flex items-center text-xl">
+                  <DatabaseIcon className="mr-2 h-6 w-6 text-primary" />
                   Database Connection
                 </CardTitle>
-                <CardDescription className="text-gray-300">
+                <CardDescription className="text-base">
                   Enter your MongoDB connection details to get started
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleConnect} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="uri" className="text-white">MongoDB URI</Label>
+                    <Label htmlFor="uri" className="text-base font-medium">MongoDB URI</Label>
                     <Input
                       id="uri"
                       value={uri}
@@ -120,46 +168,46 @@ export function ConnectPage() {
                       placeholder="mongodb+srv://user:pass@cluster.mongodb.net/dbname"
                       required
                       type="password"
-                      className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                      className="h-12 text-base transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                     />
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="llmUrl" className="text-white">LLM API URL</Label>
+                      <Label htmlFor="llmUrl" className="text-base font-medium">LLM API URL</Label>
                       <Input
                         id="llmUrl"
                         value={llmUrl}
                         onChange={(e) => setLlmUrl(e.target.value)}
                         placeholder="http://localhost:1234/v1"
-                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                        className="h-12 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="llmModel" className="text-white">LLM Model</Label>
+                      <Label htmlFor="llmModel" className="text-base font-medium">LLM Model</Label>
                       <Input
                         id="llmModel"
                         value={llmModel}
                         onChange={(e) => setLlmModel(e.target.value)}
                         placeholder="openai/gpt-oss-20b"
-                        className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
+                        className="h-12 transition-all duration-300 focus:ring-2 focus:ring-primary/20"
                       />
                     </div>
                   </div>
 
                   {error && (
-                    <Alert className="bg-red-500/10 border-red-500/20">
-                      <AlertCircleIcon className="h-4 w-4 text-red-400" />
-                      <AlertDescription className="text-red-300">
+                    <Alert className="bg-destructive/10 border-destructive/20 animate-in slide-in-from-top-2">
+                      <AlertCircleIcon className="h-4 w-4 text-destructive" />
+                      <AlertDescription className="text-destructive">
                         {error}
                       </AlertDescription>
                     </Alert>
                   )}
 
                   {success && (
-                    <Alert className="bg-green-500/10 border-green-500/20">
-                      <CheckCircleIcon className="h-4 w-4 text-green-400" />
-                      <AlertDescription className="text-green-300">
+                    <Alert className="bg-green-500/10 border-green-500/20 animate-in slide-in-from-top-2">
+                      <CheckCircleIcon className="h-4 w-4 text-green-500" />
+                      <AlertDescription className="text-green-600 dark:text-green-400">
                         Connected successfully! Redirecting to dashboard...
                       </AlertDescription>
                     </Alert>
@@ -168,9 +216,18 @@ export function ConnectPage() {
                   <Button 
                     type="submit" 
                     disabled={loading || success}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3"
+                    className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                   >
-                    {loading ? "Connecting..." : success ? "Connected!" : "Connect Database"}
+                    {loading ? (
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                        Connecting...
+                      </div>
+                    ) : success ? (
+                      "Connected!"
+                    ) : (
+                      "Connect Database"
+                    )}
                   </Button>
                 </form>
               </CardContent>
@@ -178,66 +235,65 @@ export function ConnectPage() {
 
             {/* Features Preview */}
             <div className="space-y-6">
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <Card className="glass border-primary/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center">
-                    <BrainIcon className="mr-2 h-5 w-5 text-purple-400" />
-                    AI-Powered Queries
+                  <CardTitle className="flex items-center text-lg">
+                    <BrainIcon className="mr-2 h-5 w-5 text-primary" />
+                    AI-Powered Intelligence
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm">
+                  <div className="code-block">
                     <div className="text-gray-400 mb-2">// Natural language input:</div>
-                    <div className="text-green-400">"Show me users who signed up last week"</div>
-                    <div className="text-gray-400 mt-4 mb-2">// Generated MongoDB query:</div>
+                    <div className="text-green-400 mb-4">"Show me users who signed up last week"</div>
+                    <div className="text-gray-400 mb-2">// Generated MongoDB query:</div>
                     <div className="text-blue-400">
                       {`db.users.find({
   createdAt: {
     $gte: new Date('2025-01-06'),
     $lt: new Date('2025-01-13')
   }
-})`}
+}).sort({ createdAt: -1 })`}
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <Card className="glass border-primary/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center">
-                    <ShieldIcon className="mr-2 h-5 w-5 text-green-400" />
+                  <CardTitle className="flex items-center text-lg">
+                    <ShieldIcon className="mr-2 h-5 w-5 text-green-500" />
                     Security First
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-2 text-gray-300">
-                    <li className="flex items-center">
-                      <CheckCircleIcon className="h-4 w-4 text-green-400 mr-2" />
-                      Read-only operations by default
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircleIcon className="h-4 w-4 text-green-400 mr-2" />
-                      Query validation & sanitization
-                    </li>
-                    <li className="flex items-center">
-                      <CheckCircleIcon className="h-4 w-4 text-green-400 mr-2" />
-                      No data storage or logging
-                    </li>
+                  <ul className="space-y-3">
+                    {[
+                      "Read-only operations by default",
+                      "Query validation & sanitization",
+                      "No data storage or logging",
+                      "Encrypted connections only"
+                    ].map((item, index) => (
+                      <li key={index} className="flex items-center group">
+                        <CheckCircleIcon className="h-4 w-4 text-green-500 mr-3" />
+                        <span className="group-hover:text-primary transition-colors duration-300">{item}</span>
+                      </li>
+                    ))}
                   </ul>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
+              <Card className="glass border-primary/20">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center">
-                    <ZapIcon className="mr-2 h-5 w-5 text-yellow-400" />
+                  <CardTitle className="flex items-center text-lg">
+                    <ZapIcon className="mr-2 h-5 w-5 text-yellow-500" />
                     Instant Results
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-300">
-                    Get formatted results in milliseconds with intelligent data visualization 
-                    and export capabilities.
+                  <p className="text-muted-foreground leading-relaxed">
+                    Get formatted results in milliseconds with intelligent data visualization, 
+                    export capabilities, and real-time performance monitoring.
                   </p>
                 </CardContent>
               </Card>
