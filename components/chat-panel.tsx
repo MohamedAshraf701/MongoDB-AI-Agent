@@ -5,6 +5,7 @@ import type React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Badge } from "@/components/ui/badge"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { BrainIcon, SendIcon, SparklesIcon } from "lucide-react"
 
 type QueryResult = {
   rows: any[]
@@ -97,33 +99,53 @@ export function ChatPanel({
   }
 
   return (
-    <Card>
+    <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="text-base">Ask a question</CardTitle>
-        <CardDescription>We'll generate a safe plan and run it. Write operations require confirmation.</CardDescription>
+        <CardTitle className="text-white flex items-center">
+          <BrainIcon className="mr-2 h-5 w-5 text-purple-400" />
+          AI Query Assistant
+        </CardTitle>
+        <CardDescription className="text-gray-300">
+          Ask questions in natural language. Write operations require confirmation for safety.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleAsk} className="space-y-3">
+          <div className="flex items-center gap-2 mb-3">
+            <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+              <SparklesIcon className="w-3 h-3 mr-1" />
+              AI Powered
+            </Badge>
+            <Badge className="bg-green-500/20 text-green-300 border-green-500/30">
+              Safe Mode
+            </Badge>
+          </div>
           <Textarea
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="e.g., How many users signed up last week? Or: Update all inactive users to active status"
             disabled={disabled || loading}
             rows={3}
+            className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 resize-none"
           />
-          {error ? <div className="text-sm text-red-600">{error}</div> : null}
+          {error ? <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-md p-3">{error}</div> : null}
           <div className="flex items-center gap-2">
-            <Button type="submit" disabled={disabled || loading}>
+            <Button 
+              type="submit" 
+              disabled={disabled || loading}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              <SendIcon className="mr-2 h-4 w-4" />
               {loading ? "Thinking..." : "Ask"}
             </Button>
-            {disabled ? <span className="text-sm text-muted-foreground">Connect to a database first.</span> : null}
+            {disabled ? <span className="text-sm text-gray-400">Connect to a database first.</span> : null}
           </div>
         </form>
       </CardContent>
 
       {/* Confirmation Dialog for Write Operations */}
       <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-slate-900 border-white/20 text-white">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Confirm {pendingPlan?.action === "update" ? "Update" : "Delete"} Operation
@@ -156,7 +178,7 @@ export function ChatPanel({
             <AlertDialogCancel onClick={() => {
               setShowConfirmation(false)
               setPendingPlan(null)
-            }}>
+            }} className="border-white/20 text-white hover:bg-white/10">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -167,7 +189,7 @@ export function ChatPanel({
                   setPendingPlan(null)
                 }
               }}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
               {pendingPlan?.action === "update" ? "Update" : "Delete"}
             </AlertDialogAction>

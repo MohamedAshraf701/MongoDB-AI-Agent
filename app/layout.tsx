@@ -5,9 +5,9 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'MongoDB AI Agent - Query Your Database with Natural Language',
+  description: 'Transform your database interactions with AI. Ask questions in plain English and get instant, secure MongoDB queries.',
+  generator: 'MongoDB AI Agent',
 }
 
 export default function RootLayout({
